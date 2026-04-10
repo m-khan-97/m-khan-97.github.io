@@ -2,7 +2,7 @@
 
 > Post-Quantum Security Research 路 Cloud Architecture 路 AI & Infrastructure Automation
 
-Live at: **[mibrahim-khan.github.io](https://mibrahim-khan.github.io)**
+Live at: **[m-khan-97.github.io](https://m-khan-97.github.io)**
 
 ---
 
@@ -18,7 +18,7 @@ I write about post-quantum cryptography, cloud infrastructure, and applied AI 鈥
 
 | Post | Topic | Date |
 |------|-------|------|
-| [Why Post-Quantum Cryptography Is Urgent Now](https://mibrahim-khan.github.io/posts/pqc-urgent-now.html) | PQC 路 Cloud Security | Apr 2026 |
+| [Why Post-Quantum Cryptography Is Urgent Now](https://m-khan-97.github.io/posts/pqc-urgent-now.html) | PQC 路 Cloud Security | Apr 2026 |
 | Wire-Level PQC Detection: What Your TLS Handshakes Are Actually Saying | PQC 路 TLS | Coming |
 | What Cloud Architects Get Wrong About Security Boundaries | Cloud 路 DevSecOps | Coming |
 | From Runtime Observations to Lean 4 Theorems: Bridging the Verification Gap | Formal Methods | Coming |
@@ -56,7 +56,10 @@ An end-to-end system for detecting, analysing, and formally verifying PQC readin
 ## Connect
 
 - LinkedIn: [linkedin.com/in/mibrahim-khan](https://www.linkedin.com/in/mibrahim-khan)
-- Blog: [mibrahim-khan.github.io](https://mibrahim-khan.github.io)
+- GitHub: [github.com/m-khan-97](https://github.com/m-khan-97)
+- Blog: [m-khan-97.github.io](https://m-khan-97.github.io)
+- Industry & Consulting: muhammad.ibrahim@qa.com
+- Academic & Research: m.ibrahim@ulster.ac.uk
 
 ---
 
