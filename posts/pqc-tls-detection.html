@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Most scanning tools check cipher suite lists. the prototype system goes deeper — parsing raw TLS ServerHello bytes to detect PQC key encapsulation at the wire level. Here's what your TLS handshakes are actually saying.">
+  <meta name="author" content="Muhammad Ibrahim">
+  <meta property="og:title" content="Wire-Level PQC Detection: What Your TLS Handshakes Are Actually Saying">
+  <meta property="og:description" content="Most tools tell you what cipher suites your server supports. the prototype system tells you what cryptographic guarantees your infrastructure is actually providing — at the wire level.">
+  <meta property="og:type" content="article">
+  <title>Wire-Level PQC Detection: What Your TLS Handshakes Are Actually Saying — Muhammad Ibrahim</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a1a;--ink-muted:#555;--ink-light:#888;--bg:#ffffff;--bg-alt:#f7f7f5;--border:#e5e5e5;--accent:#1a3a5c;--accent-mid:#2d5f8a;--accent-light:#eff6ff;--accent-border:#bfdbfe;--code-bg:#f4f4f4;--code-border:#e0e0e0;--max-width:720px;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'DM Mono','Courier New',monospace}
+    body{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.75;color:var(--ink);background:var(--bg);padding:0 1rem}
+    header{max-width:var(--max-width);margin:0 auto;padding:3rem 0 2rem;border-bottom:1px solid var(--border)}
+    .site-name{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--ink-muted);text-decoration:none;letter-spacing:0.02em}
+    .site-name:hover{color:var(--accent)}
+    nav{margin-top:0.5rem;font-family:var(--sans);font-size:13px}
+    nav a{color:var(--ink-light);text-decoration:none;margin-right:1.25rem}
+    nav a:hover{color:var(--accent)}
+    article{max-width:var(--max-width);margin:0 auto;padding:3rem 0 5rem}
+    .article-meta{font-family:var(--mono);font-size:13px;color:var(--ink-light);margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+    .tag{background:var(--accent-light);color:var(--accent-mid);border:1px solid var(--accent-border);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500}
+    h1{font-family:var(--serif);font-size:2.25rem;font-weight:400;line-height:1.2;color:var(--ink);margin-bottom:1rem}
+    .subtitle{font-size:1.15rem;color:var(--ink-muted);font-style:italic;margin-bottom:2rem;line-height:1.5}
+    h2{font-family:var(--sans);font-size:1.4rem;font-weight:500;color:var(--ink);margin:2.5rem 0 0.75rem}
+    h3{font-family:var(--sans);font-size:1.1rem;font-weight:500;color:var(--ink);margin:2rem 0 0.5rem}
+    p{margin-bottom:1.25rem}
+    strong{font-weight:700}
+    em{font-style:italic}
+    a{color:var(--accent-mid)}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);background:var(--code-bg);border:1px solid var(--code-border);padding:2px 6px;border-radius:3px;font-size:0.82em}
+    pre{font-family:var(--mono);background:var(--code-bg);border:1px solid var(--code-border);border-radius:6px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;font-size:0.85em;line-height:1.6}
+    pre code{background:none;border:none;padding:0;font-size:inherit}
+    .callout{background:#fffbeb;border-left:4px solid #fde68a;border-radius:0 6px 6px 0;padding:1rem 1.25rem;margin:2rem 0;font-size:0.95rem}
+    .callout strong{color:#92400e;display:block;margin-bottom:0.25rem;font-family:var(--sans);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em}
+    .info-box{background:var(--accent-light);border:1px solid var(--accent-border);border-radius:8px;padding:1.25rem 1.5rem;margin:2rem 0;font-size:0.95rem}
+    .info-box strong{font-family:var(--sans);display:block;margin-bottom:0.5rem;color:var(--accent-mid)}
+    .key-question{background:var(--bg-alt);border-radius:8px;padding:1.5rem;margin:2rem 0;font-style:italic;font-size:1.05rem;color:var(--ink-muted);text-align:center;background:#f7f7f5}
+    ul,ol{padding-left:1.5rem;margin-bottom:1.25rem}
+    li{margin-bottom:0.4rem}
+    .byte-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-family:var(--mono);font-size:0.85rem}
+    .byte-table th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font-weight:500}
+    .byte-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+    .byte-table tr:nth-child(even){background:var(--bg-alt)}
+    .byte-table .highlight{background:#fef3c7;font-weight:700}
+    .author-bio{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;gap:1rem;align-items:flex-start;font-family:var(--sans);font-size:14px}
+    .author-avatar{width:52px;height:52px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--accent-border)}
+    .author-avatar img{width:100%;height:100%;object-fit:cover;object-position:top}
+    .author-name{font-weight:500;color:var(--ink);display:block;margin-bottom:3px}
+    .author-desc{color:var(--ink-muted);line-height:1.5}
+    .author-links{margin-top:6px}
+    .author-links a{color:var(--accent-mid);text-decoration:none;margin-right:1rem;font-size:13px}
+    .nav-post{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:13px;gap:1rem}
+    .nav-post a{color:var(--accent-mid);text-decoration:none;max-width:48%}
+    .nav-post a:hover{text-decoration:underline}
+    .nav-label{color:var(--ink-light);display:block;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
+    footer{max-width:var(--max-width);margin:0 auto;padding:1.5rem 0 3rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:13px;color:var(--ink-light)}
+    @media(max-width:600px){body{font-size:17px}h1{font-size:1.75rem}}
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="site-name" href="/">Muhammad Ibrahim</a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/#research">Research</a>
+    <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a>
+    <a href="https://github.com/m-khan-97" target="_blank">GitHub</a>
+  </nav>
+</header>
+
+<article>
+
+  <div class="article-meta">
+    <span>April 2026</span>
+    <span>·</span>
+    <span>14 min read</span>
+    <span>·</span>
+    <span class="tag">Post-Quantum Cryptography</span>
+    <span class="tag">TLS</span>
+    <span class="tag">Research</span>
+  </div>
+
+  <h1>Wire-Level PQC Detection: What Your TLS Handshakes Are Actually Saying</h1>
+
+  <p class="subtitle">Most tools tell you what cipher suites your server supports. the prototype system tells you what cryptographic guarantees your infrastructure is actually providing — at the wire level.</p>
+
+  <p>There is a meaningful difference between what your server <em>advertises</em> and what it actually <em>negotiates</em>. Most post-quantum cryptography scanning tools operate at the configuration layer — they inspect your server settings, your nginx or Apache TLS configuration, your certificate metadata. They tell you what cipher suites are enabled.</p>
+
+  <p>But cipher suite configuration is not the same as cryptographic negotiation. A server can be configured to support ML-KEM and still negotiate a classical ECDH handshake with every client that connects. The configuration says one thing. The wire says another.</p>
+
+  <p>This gap — between advertised capability and actual negotiated cryptography — is the problem that this research prototype was built to close.</p>
+
+  <div class="callout">
+    <strong>The core argument</strong>
+    If you haven't inspected your live TLS handshakes at the byte level, you don't actually know your PQC posture. You know your configuration. Those are different things.
+  </div>
+
+  <h2>How TLS negotiation actually works</h2>
+
+  <p>To understand why wire-level detection matters, it helps to understand how TLS 1.3 negotiation proceeds. The sequence is deceptively simple:</p>
+
+  <ol>
+    <li>The client sends a <strong>ClientHello</strong> — listing the cipher suites, supported groups, and key share data it is willing to use.</li>
+    <li>The server responds with a <strong>ServerHello</strong> — selecting a single cipher suite and key share from the client's offerings, and providing its own key share data.</li>
+    <li>Both parties derive session keys from the exchanged key material. Everything after this point is encrypted.</li>
+  </ol>
+
+  <p>The ServerHello is the moment of truth. It is the server's binding commitment to a specific cryptographic algorithm for this session. And it is encoded as a structured binary message with a precisely defined format — which means it can be parsed, inspected, and analysed at the byte level.</p>
+
+  <h2>What the ServerHello byte structure tells you</h2>
+
+  <p>A TLS 1.3 ServerHello message follows a well-documented structure. The fields that matter most for PQC detection are the <strong>supported_groups extension</strong> (which encodes the named group used for key exchange) and the <strong>key_share extension</strong> (which contains the actual key material).</p>
+
+  <p>For classical TLS, you typically see named groups like <code>x25519</code> (0x001d) or <code>secp256r1</code> (0x0017). For hybrid PQC handshakes, you see combined named groups — such as <code>X25519MLKEM768</code> (0x11ec) — where the key share contains concatenated classical and PQC key material.</p>
+
+  <table class="byte-table">
+    <tr><th>Offset</th><th>Field</th><th>Value (example)</th><th>Meaning</th></tr>
+    <tr><td>0</td><td>Content type</td><td>0x16</td><td>Handshake record</td></tr>
+    <tr><td>1–2</td><td>Legacy version</td><td>0x03 0x03</td><td>TLS 1.2 compatibility</td></tr>
+    <tr><td>5</td><td>Handshake type</td><td>0x02</td><td>ServerHello</td></tr>
+    <tr class="highlight"><td>38–39</td><td>Cipher suite</td><td>0x13 0x01</td><td>TLS_AES_128_GCM_SHA256</td></tr>
+    <tr class="highlight"><td>ext offset</td><td>Supported group</td><td>0x11 0xec</td><td>X25519MLKEM768 — hybrid PQC</td></tr>
+    <tr><td>ext offset</td><td>Supported group</td><td>0x00 0x1d</td><td>x25519 — classical only</td></tr>
+  </table>
+
+  <p>The named group value at the key_share extension is the definitive signal. <code>0x001d</code> means classical x25519. <code>0x11ec</code> means hybrid ML-KEM-768 with x25519. These two bytes tell you more about your actual PQC posture than any configuration audit.</p>
+
+  <h2>The the prototype system detection approach</h2>
+
+  <p>a prototype PQC detection system I developed as part of my research — performs detection by capturing live TLS traffic and parsing the raw ServerHello bytes in real time. The approach has three stages:</p>
+
+  <h3>Stage 1 — Packet capture and handshake isolation</h3>
+
+  <p>the prototype captures network traffic on the target interface and filters for TLS handshake records. Because TLS 1.3 encrypts application data immediately after the handshake, the ServerHello is the only point at which the negotiated parameters are visible in plaintext on the wire. the prototype system isolates these records from the packet stream for analysis.</p>
+
+  <h3>Stage 2 — ServerHello byte parsing</h3>
+
+  <p>Each captured ServerHello is parsed according to the TLS 1.3 record format. the prototype system extracts the extensions block, locates the <code>key_share</code> extension (type <code>0x0033</code>), and reads the named group identifier from the server's key share entry.</p>
+
+  <p>The named group value is then classified against a registry of known algorithm identifiers:</p>
+
+  <ul>
+    <li><strong>Classical only</strong> — x25519 (<code>0x001d</code>), secp256r1 (<code>0x0017</code>), secp384r1 (<code>0x0018</code>)</li>
+    <li><strong>Hybrid PQC</strong> — X25519MLKEM768 (<code>0x11ec</code>), SecP256r1MLKEM768 (<code>0x11eb</code>)</li>
+    <li><strong>Pure PQC</strong> — MLKEM768 (<code>0x0200</code>), MLKEM1024 (<code>0x0201</code>)</li>
+    <li><strong>Unknown / unrecognised</strong> — flagged for manual review</li>
+  </ul>
+
+  <h3>Stage 3 — Formal verification artefact generation</h3>
+
+  <p>This is where this approach goes beyond conventional scanning tools. For each observed handshake, the prototype system generates a structured verification artefact — a formal record of the negotiated parameters, the observed key material lengths, and the classification result. These artefacts are designed to bridge the gap between runtime observation and formal cryptographic verification.</p>
+
+  <p>The artefacts can be ingested by formal verification toolchains — including Lean 4 theorem provers and Tamarin protocol models — to produce machine-verifiable proofs about the cryptographic guarantees that a given session actually provided. This transforms a runtime observation into a formally verifiable claim: not just "we observed a PQC handshake" but "we have machine-verifiable proof that this session used ML-KEM-768 key encapsulation."</p>
+
+  <div class="info-box">
+    <strong>Why formal verification matters for PQC migration</strong>
+    Regulatory and compliance frameworks increasingly require verifiable evidence of security posture, not just configuration documentation. A formally verified artefact that proves a session used quantum-resistant key exchange is a fundamentally different class of evidence from a configuration screenshot. As PQC compliance requirements emerge in financial services, healthcare, and government sectors, the ability to produce machine-verifiable proof of cryptographic posture will become increasingly important.
+  </div>
+
+  <h2>What the detection surface looks like in practice</h2>
+
+  <p>When the prototype is deployed against against a real infrastructure, the findings typically fall into four categories:</p>
+
+  <p><strong>Fully classical endpoints</strong> — servers negotiating x25519 or ECDH exclusively, with no PQC capability. These are the highest-priority migration targets. They are producing encrypted traffic that is potentially vulnerable to harvest-now-decrypt-later collection.</p>
+
+  <p><strong>PQC-capable but not negotiating PQC</strong> — servers that are configured to support hybrid cipher suites but are negotiating classical handshakes in practice. This is the most common and most dangerous finding. The configuration audit says PQC-ready; the wire says classical. This happens when clients connecting to the server don't yet support hybrid groups, so the server falls back to classical negotiation.</p>
+
+  <p><strong>Hybrid PQC endpoints</strong> — servers successfully negotiating hybrid key exchange, typically X25519MLKEM768, with PQC-capable clients. This is the current best-practice posture — quantum-resistant for clients that support it, classically secure for those that don't.</p>
+
+  <p><strong>Application-layer PQC with classical transport</strong> — perhaps the most interesting finding. Some systems implement PQC algorithms at the application layer — encrypting payloads using ML-KEM or Dilithium — while presenting a classical TLS frontend. the prototype detects this pattern through the mismatch between the observed ServerHello (classical) and application-layer indicators, and flags it as a configuration that requires careful documentation to avoid being misclassified as either fully quantum-safe or fully classical.</p>
+
+  <div class="callout">
+    <strong>The mismatch finding</strong>
+    The application-layer versus transport-layer PQC mismatch is one of the most commonly misunderstood postures in enterprise infrastructure. A system running CRYSTALS-Kyber at the application layer is not the same as a quantum-safe system — if the TLS transport is classical, the session keys are still vulnerable. the prototype makes this distinction explicit.
+  </div>
+
+
+  <h2>What the methodology reveals in practice</h2>
+
+  <p>When this detection approach is applied to real infrastructure, findings tend to fall into one of the four classification states described above. The most significant and consistent finding across evaluations is the application-layer versus transport-layer mismatch — servers that are configured with PQC algorithm support at the application layer but are presenting a classical TLS frontend to every connecting client.</p>
+
+  <p>This finding is not rare. It is the default state of most systems that have begun PQC implementation without upgrading their TLS frontend to an OQS-capable library. Configuration audits miss it entirely. Certificate inspection misses it. Only wire-level ServerHello parsing reveals it — because only the ServerHello contains the actual group identifier that was negotiated.</p>
+
+  <p>A second consistent finding: detecting PQC negotiation in the wild requires OQS-capable client tooling. A measurement client running stock OpenSSL will advertise only classical groups in its ClientHello — which means even servers with full server-side PQC capability will respond with classical negotiation. This means that most existing PQC deployment surveys significantly undercount actual PQC capability in production infrastructure.</p>
+
+  <p>I will share detailed evaluation findings here as this research progresses toward publication. If you are working on PQC deployment assessment and want to discuss methodology, I would welcome the conversation.</p>
+
+
+  <h2>The gap between scanning and knowing</h2>
+
+  <p>Configuration audits answer the question: what is this server capable of? Wire-level detection answers the question: what is this server actually doing?</p>
+
+  <p>For most organisations, the answer to these two questions is different — and the gap between them is where the real risk lives. A server that is capable of hybrid PQC but negotiating classical handshakes with 90% of its clients is, for those clients, indistinguishable from a server with no PQC capability at all.</p>
+
+  <p>Understanding your actual negotiated cipher suite distribution — across real clients, under real traffic conditions — requires wire-level visibility. It cannot be inferred from configuration alone.</p>
+
+  <div class="key-question">
+    Of the TLS sessions your infrastructure completed in the last 24 hours, what percentage negotiated a PQC or hybrid key exchange?
+  </div>
+
+  <p>If you don't know the answer to that question, you don't yet know your PQC posture. You know your PQC configuration. The research underpinning the prototype — including the full detection methodology and formal verification pipeline — is in preparation for publication. I will share details here as the papers approach submission.</p>
+
+  <p>If you are working on PQC migration, infrastructure security, or formal verification of cryptographic protocols, I would welcome the conversation. You can reach me on <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a> or via my <a href="/" target="_blank">research blog</a>.</p>
+
+  <div class="author-bio">
+    <div class="author-avatar"><img src="data:image/png;base64,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" alt="Muhammad Ibrahim"></div>
+    <div>
+      <span class="author-name">Muhammad Ibrahim</span>
+      <span class="author-desc">Post-Quantum Security Researcher · Cloud Architect · Contributor to the prototype system at my research group · Research co-authored with Imperial College London · MSc, Middlesex University London</span>
+      <div class="author-links">
+        <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a>
+        <a href="https://medium.com/@ibrahim.logix" target="_blank">Medium</a>
+        <a href="https://github.com/m-khan-97" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-post">
+    <a href="pqc-urgent-now.html">
+      <span class="nav-label">Previous</span>
+      Why Post-Quantum Cryptography Is Urgent Now
+    </a>
+    <a href="/" style="text-align:right">
+      <span class="nav-label">Home</span>
+      Back to all posts
+    </a>
+  </div>
+
+</article>
+
+<footer>
+  © 2026 Muhammad Ibrahim · London, UK · <a href="/">m-khan-97.github.io</a>
+</footer>
+
+</body>
+</html>
