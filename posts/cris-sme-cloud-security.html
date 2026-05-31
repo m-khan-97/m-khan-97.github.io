@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="43% of UK businesses were breached last year. Most didn't have the tools to prevent it — not because they didn't care, but because the tools weren't built for them.">
+  <meta name="author" content="Muhammad Ibrahim">
+  <meta property="og:title" content="Why UK SMEs and NHS Suppliers Are the Biggest Unsolved Problem in Cloud Security">
+  <meta property="og:description" content="Enterprise cloud security tools assume enterprise budgets. NHS suppliers and UK SMEs are left with scanner-centric long lists and no guidance on what to fix first. Here is what actually works.">
+  <meta property="og:type" content="article">
+  <title>Why UK SMEs and NHS Suppliers Are the Biggest Unsolved Problem in Cloud Security — Muhammad Ibrahim</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f7f4;
+      --surface: #ffffff;
+      --ink: #1a1a1a;
+      --ink-muted: #5c5c5c;
+      --ink-faint: #999;
+      --accent: #1a5276;
+      --accent-light: #d6e4f0;
+      --accent-warm: #c0392b;
+      --accent-warm-light: #f9ebea;
+      --teal: #0e6655;
+      --teal-light: #d1f2eb;
+      --amber: #d68910;
+      --amber-light: #fef9e7;
+      --border: #e8e4de;
+      --rule: #d5cfc6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--ink);
+      background: var(--bg);
+      padding: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(249,247,244,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    nav a { text-decoration: none; color: var(--ink-muted); font-size: 14px; font-weight: 500; }
+    nav a:hover { color: var(--accent); }
+    .nav-brand { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--ink); }
+    .nav-links { display: flex; gap: 1.5rem; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-warm);
+      border: 1px solid var(--accent-warm);
+      border-radius: 2px;
+      padding: 3px 10px;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+    .hero-lede {
+      font-size: 1.15rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 2rem;
+      max-width: 680px;
+    }
+    .byline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+    .byline-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .byline-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .byline-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+    .byline-meta { font-size: 13px; color: var(--ink-faint); margin-top: 2px; }
+    .byline-links { margin-left: auto; display: flex; gap: 1rem; }
+    .byline-links a { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+    .byline-links a:hover { text-decoration: underline; }
+
+    /* ── STAT CARDS ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2.5rem 0;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.4rem;
+      color: var(--accent-warm);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label { font-size: 12px; color: var(--ink-muted); line-height: 1.4; }
+
+    /* ── ARTICLE BODY ── */
+    article {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+    article p { margin-bottom: 1.5rem; color: var(--ink); }
+    article p:last-child { margin-bottom: 0; }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin: 3rem 0 1rem;
+      line-height: 1.3;
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 2rem 0 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── CALLOUT BOXES ── */
+    .callout {
+      border-radius: 6px;
+      padding: 1.5rem 1.75rem;
+      margin: 2rem 0;
+    }
+    .callout-teal { background: var(--teal-light); border-left: 4px solid var(--teal); }
+    .callout-amber { background: var(--amber-light); border-left: 4px solid var(--amber); }
+    .callout-blue { background: var(--accent-light); border-left: 4px solid var(--accent); }
+    .callout-red { background: var(--accent-warm-light); border-left: 4px solid var(--accent-warm); }
+    .callout-title {
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+    .callout-teal .callout-title { color: var(--teal); }
+    .callout-amber .callout-title { color: var(--amber); }
+    .callout-blue .callout-title { color: var(--accent); }
+    .callout-red .callout-title { color: var(--accent-warm); }
+    .callout p { margin-bottom: 0.5rem; font-size: 15px; }
+
+    /* ── PROBLEM LIST ── */
+    .problem-list { list-style: none; margin: 1.5rem 0; }
+    .problem-list li {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .problem-list li:last-child { border-bottom: none; }
+    .problem-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-warm-light);
+      color: var(--accent-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .problem-text strong { display: block; font-size: 15px; margin-bottom: 2px; }
+    .problem-text span { font-size: 14px; color: var(--ink-muted); }
+
+    /* ── FEATURE GRID ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+    }
+    .feature-card-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p { font-size: 14px; color: var(--ink-muted); margin-bottom: 0; }
+
+    /* ── ZERO COST FIXES ── */
+    .fix-list { list-style: none; margin: 1rem 0; }
+    .fix-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      font-size: 15px;
+    }
+    .fix-num {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .code-block code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #a8d8ea;
+      line-height: 1.7;
+      white-space: pre;
+      display: block;
+    }
+    .code-comment { color: #5c7a8a; }
+    .code-key { color: #f9ca24; }
+    .code-val { color: #a8d8ea; }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 14px;
+    }
+    .compare-table th {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .compare-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .compare-table tr:nth-child(even) td { background: #f5f3f0; }
+    .tick { color: var(--teal); font-weight: 700; }
+    .cross { color: var(--accent-warm); font-weight: 700; }
+
+    /* ── PULL QUOTE ── */
+    blockquote {
+      margin: 2.5rem 0;
+      padding: 1.5rem 2rem;
+      border-left: 4px solid var(--accent);
+      background: var(--surface);
+      border-radius: 0 6px 6px 0;
+    }
+    blockquote p {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      line-height: 1.5;
+      color: var(--ink);
+      margin-bottom: 0;
+      font-style: italic;
+    }
+
+    /* ── DIVIDER ── */
+    .rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 3rem 0;
+    }
+
+    /* ── AUTHOR BIO ── */
+    .author-bio {
+      display: flex;
+      gap: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 3rem 0;
+      align-items: flex-start;
+    }
+    .bio-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--accent);
+    }
+    .bio-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .bio-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .bio-desc { font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 0.75rem; }
+    .bio-links { display: flex; gap: 1rem; }
+    .bio-links a { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+    .bio-links a:hover { text-decoration: underline; }
+
+    /* ── NAV POSTS ── */
+    .nav-post {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .nav-post a {
+      display: block;
+      flex: 1;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 14px;
+      transition: border-color 0.15s;
+    }
+    .nav-post a:hover { border-color: var(--accent); }
+    .nav-label { display: block; font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 13px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .nav-post { flex-direction: column; }
+      .byline-links { display: none; }
+      h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">Muhammad Ibrahim</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/#research">Research</a>
+    <a href="/#blog">Blog</a>
+    <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <span class="hero-tag">Cloud Security · NHS · UK SMEs</span>
+  <h1>Why UK SMEs and NHS Suppliers Are the Biggest Unsolved Problem in Cloud Security</h1>
+  <p class="hero-lede">Enterprise cloud security tools assume enterprise budgets. NHS suppliers and UK SMEs are left with scanner-generated lists and no guidance on what to fix first. This is the problem CRIS-SME was built to solve.</p>
+
+  <div class="byline">
+    <div class="byline-avatar">
+      <img src="../images/profile.jpg" alt="Muhammad Ibrahim" onerror="this.style.display='none';this.parentNode.innerHTML='MI'">
+    </div>
+    <div>
+      <div class="byline-name">Muhammad Ibrahim</div>
+      <div class="byline-meta">Cloud Architect · Security Researcher · 8 min read · June 2026</div>
+    </div>
+    <div class="byline-links">
+      <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a>
+      <a href="https://medium.com/@ibrahim.logix" target="_blank">Medium</a>
+      <a href="https://github.com/m-khan-97" target="_blank">GitHub</a>
+    </div>
+  </div>
+</div>
+
+<article>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-number">43%</div>
+      <div class="stat-label">of UK businesses suffered a cyber breach or attack in the past 12 months</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">99%</div>
+      <div class="stat-label">of UK businesses are SMEs — the segment least equipped to respond</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">27%</div>
+      <div class="stat-label">of NHS data breaches traced back to third-party supplier failures</div>
+    </div>
+  </div>
+
+  <p>Those three numbers sit at the heart of a problem that the UK cybersecurity industry has largely failed to solve. Not because the problem is unsolvable, but because the tools being built assume resources that most organisations simply do not have.</p>
+
+  <p>The average UK SME does not have a CISO. It does not have a £10,000/month security budget. It does not have a team of engineers who can spend a week triaging 400 findings from a cloud scanner. And yet, it may hold NHS patient data, process financial records, or sit inside a supply chain that feeds directly into critical national infrastructure.</p>
+
+  <p>This is the gap. And it is not a small one.</p>
+
+  <h2>Why Enterprise Tools Fail SMEs</h2>
+
+  <p>The cloud security market is not short of tools. Wiz, Orca Security, Microsoft Defender for Cloud, Prowler, Scout Suite — the landscape is dense. But these tools were designed for enterprise environments, and they show it.</p>
+
+  <ul class="problem-list">
+    <li>
+      <div class="problem-icon">⚠</div>
+      <div class="problem-text">
+        <strong>Scanner-centric output</strong>
+        <span>Tools produce exhaustive lists of findings ranked by CVSS score — useful for a security analyst, overwhelming for a solo IT manager at a 20-person company.</span>
+      </div>
+    </li>
+    <li>
+      <div class="problem-icon">⚠</div>
+      <div class="problem-text">
+        <strong>No budget context</strong>
+        <span>Remediation advice assumes you can purchase additional services, spin up new infrastructure, or engage a specialist consultant. Most SMEs cannot.</span>
+      </div>
+    </li>
+    <li>
+      <div class="problem-icon">⚠</div>
+      <div class="problem-text">
+        <strong>UK compliance blind spots</strong>
+        <span>Findings are mapped to generic frameworks — CIS Benchmarks, NIST CSF — but not to Cyber Essentials, UK GDPR, or the NHS Data Security and Protection Toolkit (DSPT). UK-specific obligations require a separate translation effort.</span>
+      </div>
+    </li>
+    <li>
+      <div class="problem-icon">⚠</div>
+      <div class="problem-text">
+        <strong>No prioritisation logic for constrained environments</strong>
+        <span>High-severity findings requiring £5,000 in tooling are ranked the same as high-severity findings requiring a single configuration change. There is no budget-aware triage.</span>
+      </div>
+    </li>
+  </ul>
+
+  <p>The result is that most UK SMEs either over-invest in tools they cannot operationalise, or under-invest entirely and remain exposed. Neither outcome is acceptable when those organisations hold sensitive data or operate in regulated supply chains.</p>
+
+  <h2>The NHS Supplier Problem Specifically</h2>
+
+  <p>NHS Digital's Data Security and Protection Toolkit requires any organisation handling NHS patient data to demonstrate compliance across ten security standards. For NHS suppliers — many of which are SMEs — this is an annual audit obligation with real consequences for contract renewal.</p>
+
+  <blockquote>
+    <p>The organisations most likely to be the weak link in the NHS supply chain are also the organisations least equipped to identify and fix that weakness themselves.</p>
+  </blockquote>
+
+  <p>A mid-size health-tech supplier processing appointment records or referral data faces the same DSPT requirements as a large system integrator — but without the compliance team, the tooling budget, or the institutional knowledge. Consultant-led assessments frequently cost between £3,000 and £8,000 for a single engagement. Many SMEs simply cannot absorb that cost annually.</p>
+
+  <p>The consequence is rubber-stamped self-assessments, unresolved misconfigurations, and a compliance posture that looks adequate on paper but is materially fragile underneath. This is not a hypothetical risk — it is the pattern that explains why 27% of NHS data breaches are traced to third-party supplier failures.</p>
+
+  <h2>What CRIS-SME Does Differently</h2>
+
+  <p>CRIS-SME — the Cloud Risk Intelligence System for SME Environments — was built specifically for this context. It is not a scanner. It is a risk intelligence and compliance framework designed around the actual constraints of UK SMEs and NHS suppliers.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-card-title">Explainable Risk Scoring</div>
+      <p>Every risk finding includes a plain-language explanation, a compliance mapping, and a cost-tiered remediation path — not just a CVSS score.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-title">UK Compliance Crosswalk</div>
+      <p>Findings are mapped directly to Cyber Essentials, UK GDPR, and the NHS DSPT — so SMEs know exactly which obligation each finding affects.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-title">Budget-Aware Remediation</div>
+      <p>Remediation recommendations are tiered by cost — zero-cost configuration changes are surfaced first, with higher-cost options clearly labelled.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-title">Audit-Ready Output</div>
+      <p>CRIS-SME generates structured output suitable for DSPT self-assessment submissions and internal governance documentation.</p>
+    </div>
+  </div>
+
+  <h2>The Five Zero-Cost Fixes Finding</h2>
+
+  <div class="callout callout-teal">
+    <div class="callout-title">Key Finding</div>
+    <p>Across evaluated environments, five zero-cost configuration changes — remediable in under two hours with no additional tooling — recovered more than half the risk reduction achievable through a full £750/month managed remediation programme.</p>
+  </div>
+
+  <p>This finding is not a footnote. It is the central practical insight of the CRIS-SME framework. The security posture gap for most UK SMEs is not primarily a resource gap — it is a knowledge gap. Organisations do not know which configuration changes matter most, so they either do nothing or spend money they cannot afford on changes that move the needle less than expected.</p>
+
+  <p>The five zero-cost fixes that consistently appeared across evaluated environments:</p>
+
+  <ul class="fix-list">
+    <li><span class="fix-num">1</span>Disabling public blob/bucket access on cloud storage — a default-open configuration in many deployments</li>
+    <li><span class="fix-num">2</span>Enabling MFA on all privileged accounts — often left incomplete after initial deployment</li>
+    <li><span class="fix-num">3</span>Rotating unused access keys and service credentials older than 90 days</li>
+    <li><span class="fix-num">4</span>Enabling audit logging on database and storage services — switched off by default in cost-optimised configurations</li>
+    <li><span class="fix-num">5</span>Removing overly permissive inbound security group rules opened during development and never tightened</li>
+  </ul>
+
+  <p>Each of these can be actioned through the cloud provider console in minutes. None requires additional tooling spend. Together, they address the most commonly exploited misconfiguration classes in SME cloud environments.</p>
+
+  <h2>How CRIS-SME Compares to Existing Tools</h2>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th>CRIS-SME</th>
+        <th>Microsoft Defender for Cloud</th>
+        <th>Prowler / Scout Suite</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>UK compliance mapping (Cyber Essentials, DSPT)</td>
+        <td><span class="tick">✓</span> Native</td>
+        <td><span class="cross">✗</span> Manual</td>
+        <td><span class="cross">✗</span> Not included</td>
+      </tr>
+      <tr>
+        <td>Budget-aware remediation tiers</td>
+        <td><span class="tick">✓</span> Built-in</td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td>Plain-language explanations for non-specialists</td>
+        <td><span class="tick">✓</span></td>
+        <td><span class="cross">✗</span> Technical</td>
+        <td><span class="cross">✗</span> Technical</td>
+      </tr>
+      <tr>
+        <td>Audit-ready report output</td>
+        <td><span class="tick">✓</span></td>
+        <td><span class="tick">✓</span> Enterprise focus</td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td>Zero additional tooling cost</td>
+        <td><span class="tick">✓</span> Open source</td>
+        <td><span class="cross">✗</span> Paid tiers</td>
+        <td><span class="tick">✓</span> Open source</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-blue">
+    <div class="callout-title">Validation Note</div>
+    <p>Against Microsoft Defender for Cloud, CRIS-SME identified four additional misconfigurations not surfaced by Defender and produced zero contradictory findings — confirming complementary coverage rather than duplication.</p>
+  </div>
+
+  <h2>The Bigger Picture</h2>
+
+  <p>Cloud governance for SMEs and NHS suppliers is not a niche problem. It is the security problem that sits underneath the NHS supply chain, the UK fintech ecosystem, and the majority of the country's digital infrastructure. The organisations that keep that infrastructure running are the ones being left behind by a market that optimises for enterprise contracts.</p>
+
+  <p>There is a second dimension to this problem that is not yet widely discussed. The same organisations that are struggling to meet current cloud security obligations will face an even steeper challenge as the industry migrates to post-quantum cryptography. The configuration complexity of PQC migration — hybrid key exchange, updated TLS cipher suites, re-signed certificate chains — will land on teams that are already overwhelmed by existing compliance obligations.</p>
+
+  <p>The cloud governance problem and the PQC migration problem are not separate conversations. They are the same problem — building security that fits the people who actually have to use it — at different points on the same timeline.</p>
+
+  <hr class="rule">
+
+  <p>CRIS-SME is open-source under the MIT licence. The code and documentation are available at <a href="https://github.com/m-khan-97/CRIS-SME" target="_blank" style="color:var(--accent);">github.com/m-khan-97/CRIS-SME</a>. A paper covering the full methodology and evaluation has been submitted for peer review.</p>
+
+  <p>If you are working on cloud governance for UK SMEs or NHS suppliers, I would welcome the conversation on <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank" style="color:var(--accent);">LinkedIn</a>.</p>
+
+  <div class="author-bio">
+    <div class="bio-avatar">
+      <img src="../images/profile.jpg" alt="Muhammad Ibrahim" onerror="this.style.display='none';this.parentNode.innerHTML='MI'">
+    </div>
+    <div>
+      <div class="bio-name">Muhammad Ibrahim</div>
+      <div class="bio-desc">Cloud Architect · Security Researcher · Head of Year at QA Higher Education (Southampton Solent University Centres) · Coordinator of Research Projects at Ulster University · MSc with Distinction, Middlesex University London · Microsoft Certified Azure Solutions Architect Expert &amp; MCT</div>
+      <div class="bio-links">
+        <a href="https://www.linkedin.com/in/mibrahim-khan" target="_blank">LinkedIn</a>
+        <a href="https://medium.com/@ibrahim.logix" target="_blank">Medium</a>
+        <a href="https://github.com/m-khan-97" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-post">
+    <a href="pqc-compliance-validation.html">
+      <span class="nav-label">← Previous</span>
+      How to Prove Your Infrastructure Is PQC Compliant
+    </a>
+    <a href="/" style="text-align:right">
+      <span class="nav-label">Home →</span>
+      Back to all posts
+    </a>
+  </div>
+
+</article>
+
+<footer>
+  © 2026 Muhammad Ibrahim · London, UK · <a href="/">m-khan-97.github.io</a>
+</footer>
+
+</body>
+</html>
